@@ -31,7 +31,7 @@ defineProps<Props>()
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height: 100%;
+  min-height: 150px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 .card-header {

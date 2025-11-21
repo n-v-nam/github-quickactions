@@ -19,13 +19,19 @@
               <span class="pr-title">{{ pr.title }}</span>
               <code>{{ pr.base }}</code>
             </div>
-            <div v-if="pr.validationMessage" class="pr-validation" :class="pr.validationType">
+            <div
+              v-if="pr.validationMessage"
+              class="pr-validation"
+              :class="pr.validationType"
+            >
               {{ pr.validationMessage }}
             </div>
           </div>
           <div class="repo-pr-item-actions">
             <button @click="check(pr.number)">✅ Check</button>
-            <button :disabled="!canMerge(pr)" @click="merge(pr.number)">🔀 Merge</button>
+            <button :disabled="!canMerge(pr)" @click="merge(pr.number)">
+              🔀 Merge
+            </button>
             <button class="secondary" @click="removePR(pr.number)">🗑️</button>
           </div>
         </div>
@@ -35,28 +41,28 @@
     <div class="actions-grid">
       <ActionCard icon="📝" title="Release PR develop → main">
         <input v-model="releaseTitle" type="text" />
-        <button class="primary" :disabled="!releaseTitle.trim() || isLoadingCreateReleasePR" @click="createReleasePR">
+        <button
+          class="primary"
+          :disabled="!releaseTitle.trim() || isLoadingCreateReleasePR"
+          @click="createReleasePR"
+        >
           <span v-if="isLoadingCreateReleasePR">⏳ Đang xử lý...</span>
           <span v-else>Tạo Release PR</span>
         </button>
       </ActionCard>
 
-      <ActionCard
-        v-if="block.isDbRepo"
-        icon="🧪"
-        title="DB Pre-release"
-      >
-        <button class="primary" :disabled="isLoadingDbPreRelease" @click="publishDbPreRelease">
+      <ActionCard v-if="block.isDbRepo" icon="🧪" title="DB Pre-release">
+        <button
+          class="primary"
+          :disabled="isLoadingDbPreRelease"
+          @click="publishDbPreRelease"
+        >
           <span v-if="isLoadingDbPreRelease">⏳ Đang xử lý...</span>
           <span v-else>Publish pre-release</span>
         </button>
       </ActionCard>
 
-      <ActionCard
-        v-if="canDeployStg"
-        icon="🚀"
-        title="Deploy STG (JP)"
-      >
+      <ActionCard v-if="canDeployStg" icon="🚀" title="Deploy STG (JP)">
         <div v-if="needsDbVersion" class="db-version-block">
           <label>
             <input type="checkbox" v-model="shouldUpdateDb" />
@@ -71,7 +77,9 @@
         </div>
         <button
           class="primary"
-          :disabled="(shouldUpdateDb && !dbVersion.trim()) || isLoadingDeployStg"
+          :disabled="
+            (shouldUpdateDb && !dbVersion.trim()) || isLoadingDeployStg
+          "
           @click="deployStg"
         >
           <span v-if="isLoadingDeployStg">⏳ Đang xử lý...</span>
@@ -80,7 +88,11 @@
       </ActionCard>
 
       <ActionCard icon="🔀" title="Merge Release PR">
-        <button class="primary" :disabled="isLoadingMergeReleasePr" @click="mergeReleasePr">
+        <button
+          class="primary"
+          :disabled="isLoadingMergeReleasePr"
+          @click="mergeReleasePr"
+        >
           <span v-if="isLoadingMergeReleasePr">⏳ Đang xử lý...</span>
           <span v-else>Merge Release</span>
         </button>
@@ -91,42 +103,53 @@
           Branch
           <input v-model="bumpBranch" type="text" />
         </label>
-        <button class="primary" :disabled="!bumpBranch.trim() || isLoadingBumpVersion" @click="bumpVersion">
+        <button
+          class="primary"
+          :disabled="!bumpBranch.trim() || isLoadingBumpVersion"
+          @click="bumpVersion"
+        >
           <span v-if="isLoadingBumpVersion">⏳ Đang xử lý...</span>
           <span v-else>Bump & Push</span>
         </button>
       </ActionCard>
 
-      <ActionCard
-        v-if="block.isDbRepo"
-        icon="📦"
-        title="DB Official Release"
-      >
-        <button class="primary" :disabled="isLoadingDbOfficial" @click="publishDbOfficial">
+      <ActionCard v-if="block.isDbRepo" icon="📦" title="DB Official Release">
+        <button
+          class="primary"
+          :disabled="isLoadingDbOfficial"
+          @click="publishDbOfficial"
+        >
           <span v-if="isLoadingDbOfficial">⏳ Đang xử lý...</span>
           <span v-else>Publish official</span>
         </button>
       </ActionCard>
 
       <ActionCard icon="🏷️" title="Tag release">
-        <button class="primary" :disabled="isLoadingCreateTag" @click="createTag">
+        <button
+          class="primary"
+          :disabled="isLoadingCreateTag"
+          @click="createTag"
+        >
           <span v-if="isLoadingCreateTag">⏳ Đang xử lý...</span>
           <span v-else>Tạo & Push tag</span>
         </button>
       </ActionCard>
 
-      <ActionCard
-        icon="🧹"
-        title="Reset deploy branches"
-      >
+      <ActionCard icon="🧹" title="Reset deploy branches">
         <div class="branch-checkboxes" v-if="block.deployBranches.length">
-          <label v-for="branch in block.deployBranches" :key="branch">
+          <label
+            v-for="branch in block.deployBranches"
+            :key="branch"
+            class="branch-checkbox"
+          >
             <input
               type="checkbox"
               :value="branch"
               v-model="selectedResetBranches"
             />
-            {{ branch }}
+            <span class="branch-checkbox-label">
+              {{ branch }}
+            </span>
           </label>
         </div>
         <div v-else class="empty-state small">Chưa cấu hình deploy branch.</div>
@@ -162,17 +185,37 @@ const shouldUpdateDb = ref(false)
 const dbVersion = ref('')
 const selectedResetBranches = ref<string[]>([...props.block.deployBranches])
 
-const developBranch = computed(() => props.block.developBranch || props.block.baseBranch || 'develop')
-const canDeployStg = computed(() => props.repo === 'tomemiru' || props.repo === 'tomemiru-api')
+const developBranch = computed(
+  () => props.block.developBranch || props.block.baseBranch || 'develop',
+)
+const canDeployStg = computed(
+  () => props.repo === 'tomemiru' || props.repo === 'tomemiru-api',
+)
 const needsDbVersion = computed(() => props.repo === 'tomemiru-api')
-const isLoadingCreateReleasePR = computed(() => dashboardStore.isLoadingAction('createDevelopToMainPR', props.repo))
-const isLoadingDbPreRelease = computed(() => dashboardStore.isLoadingAction('runDbPreRelease', props.repo))
-const isLoadingDeployStg = computed(() => dashboardStore.isLoadingAction('deployStg', props.repo))
-const isLoadingMergeReleasePr = computed(() => dashboardStore.isLoadingAction('mergeReleasePr', props.repo))
-const isLoadingBumpVersion = computed(() => dashboardStore.isLoadingAction('bumpPackageVersion', props.repo))
-const isLoadingDbOfficial = computed(() => dashboardStore.isLoadingAction('publishDbOfficial', props.repo))
-const isLoadingCreateTag = computed(() => dashboardStore.isLoadingAction('pushReleaseTag', props.repo))
-const isLoadingResetDeploy = computed(() => dashboardStore.isLoadingAction('resetDeployBranches', props.repo))
+const isLoadingCreateReleasePR = computed(() =>
+  dashboardStore.isLoadingAction('createDevelopToMainPR', props.repo),
+)
+const isLoadingDbPreRelease = computed(() =>
+  dashboardStore.isLoadingAction('runDbPreRelease', props.repo),
+)
+const isLoadingDeployStg = computed(() =>
+  dashboardStore.isLoadingAction('deployStg', props.repo),
+)
+const isLoadingMergeReleasePr = computed(() =>
+  dashboardStore.isLoadingAction('mergeReleasePr', props.repo),
+)
+const isLoadingBumpVersion = computed(() =>
+  dashboardStore.isLoadingAction('bumpPackageVersion', props.repo),
+)
+const isLoadingDbOfficial = computed(() =>
+  dashboardStore.isLoadingAction('publishDbOfficial', props.repo),
+)
+const isLoadingCreateTag = computed(() =>
+  dashboardStore.isLoadingAction('pushReleaseTag', props.repo),
+)
+const isLoadingResetDeploy = computed(() =>
+  dashboardStore.isLoadingAction('resetDeployBranches', props.repo),
+)
 
 watch(
   () => props.block,
@@ -181,7 +224,7 @@ watch(
     releaseTitle.value = defaultReleaseTitle()
     selectedResetBranches.value = [...block.deployBranches]
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch(shouldUpdateDb, (value) => {
@@ -220,9 +263,11 @@ function createReleasePR() {
     { repo: props.repo, title: releaseTitle.value.trim() },
     {
       title: 'Tạo Release PR?',
-      description: `${props.block.developBranch} → ${props.block.mainBranch}\nTitle: ${releaseTitle.value.trim()}`,
-      allowModeSwitch: true
-    }
+      description: `${props.block.developBranch} → ${
+        props.block.mainBranch
+      }\nTitle: ${releaseTitle.value.trim()}`,
+      allowModeSwitch: true,
+    },
   )
 }
 
@@ -232,9 +277,10 @@ function publishDbPreRelease() {
     { repo: props.repo },
     {
       title: 'Publish DB pre-release?',
-      description: 'Checkout develop, tạo branch pre-release và chạy yarn publish.',
-      allowModeSwitch: true
-    }
+      description:
+        'Checkout develop, tạo branch pre-release và chạy yarn publish.',
+      allowModeSwitch: true,
+    },
   )
 }
 
@@ -245,19 +291,21 @@ function deployStg() {
       repo: props.repo,
       deployBranch: 'deploy-jp',
       updateDbPackage: shouldUpdateDb.value,
-      newDbVersion: dbVersion.value.trim()
+      newDbVersion: dbVersion.value.trim(),
     },
     {
       title: 'Deploy STG?',
       description: [
         `Push ${props.block.developBranch} → deploy-jp`,
-        shouldUpdateDb.value && dbVersion.value ? `Update DB package ${dbVersion.value.trim()}` : null,
-        'Chạy yarn staging:deploy'
+        shouldUpdateDb.value && dbVersion.value
+          ? `Update DB package ${dbVersion.value.trim()}`
+          : null,
+        'Chạy yarn staging:deploy',
       ]
         .filter(Boolean)
         .join('\n'),
-      allowModeSwitch: true
-    }
+      allowModeSwitch: true,
+    },
   )
 }
 
@@ -268,8 +316,8 @@ function mergeReleasePr() {
     {
       title: 'Merge Release PR?',
       description: `Rebase & merge develop → ${props.block.mainBranch}.`,
-      allowModeSwitch: true
-    }
+      allowModeSwitch: true,
+    },
   )
 }
 
@@ -280,8 +328,8 @@ function bumpVersion() {
     {
       title: 'Bump version?',
       description: `Checkout ${bumpBranch.value.trim()}, bump version và push.`,
-      allowModeSwitch: true
-    }
+      allowModeSwitch: true,
+    },
   )
 }
 
@@ -292,8 +340,8 @@ function publishDbOfficial() {
     {
       title: 'Publish DB official?',
       description: 'Checkout main, ensure sync và yarn publish.',
-      allowModeSwitch: true
-    }
+      allowModeSwitch: true,
+    },
   )
 }
 
@@ -304,8 +352,8 @@ function createTag() {
     {
       title: 'Tạo release tag?',
       description: 'Checkout main, sync origin và tạo tag version hiện tại.',
-      allowModeSwitch: true
-    }
+      allowModeSwitch: true,
+    },
   )
 }
 
@@ -315,9 +363,11 @@ function resetDeployBranches() {
     { repo: props.repo, branches: selectedResetBranches.value },
     {
       title: 'Reset deploy branch?',
-      description: `Force push ${props.block.mainBranch} vào: ${selectedResetBranches.value.join(', ')}`,
-      allowModeSwitch: true
-    }
+      description: `Force push ${
+        props.block.mainBranch
+      } vào: ${selectedResetBranches.value.join(', ')}`,
+      allowModeSwitch: true,
+    },
   )
 }
 
@@ -487,14 +537,27 @@ label {
 }
 .branch-checkboxes {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
+  flex-direction: column;
+  gap: 6px;
   font-size: 12px;
+  align-items: flex-start;
 }
-.branch-checkboxes label {
+.branch-checkbox {
+  width: 100%;
+  display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  cursor: pointer;
+}
+.branch-checkbox input {
+  width: unset;
+}
+.branch-checkbox-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .db-version-block {
   display: flex;
