@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "isolatedModules": true,
+    "types": ["vite/client"],
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "lib": ["ES2020", "DOM"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": ["node_modules"]
+}

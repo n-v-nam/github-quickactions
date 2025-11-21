@@ -1,0 +1,214 @@
+{
+  "name": "tomemiru-release-manager",
+  "displayName": "Tomemiru Release Manager",
+  "description": "VSCode extension giúp quản lý workflow release nhiều repo (PR, merge, publish) với giao diện trực quan và an toàn.",
+  "version": "1.1.0",
+  "publisher": "namcris",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "SCM",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:tomemiru-release.openDashboard",
+    "onCommand:tomemiru-release.configureSettings"
+  ],
+  "main": "./out/extension.js",
+  "enabledApiProposals": [
+    "extensionRuntime"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "tomemiru-release.openDashboard",
+        "title": "Open Dashboard",
+        "category": "Tomemiru Release",
+        "icon": "$(dashboard)"
+      },
+      {
+        "command": "tomemiru-release.configureSettings",
+        "title": "Configure Settings",
+        "category": "Tomemiru Release",
+        "icon": "$(gear)"
+      }
+    ],
+    "configuration": {
+      "title": "Tomemiru Release Manager",
+      "properties": {
+        "tomemiruRelease.authMethod": {
+          "type": "string",
+          "enum": [
+            "vscode",
+            "env",
+            "manual"
+          ],
+          "default": "vscode",
+          "markdownDescription": "Phương thức authentication GitHub. `vscode` (khuyến nghị) dùng OAuth tích hợp VSCode, `env` đọc từ file `.env`, `manual` dùng Personal Access Token lưu trong settings."
+        },
+        "tomemiruRelease.manualToken": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Personal Access Token dùng khi authMethod = `manual`. Token sẽ được mã hóa trong Secret Storage.",
+          "pattern": "^(|gh[ops]_[A-Za-z0-9_]{36,})$",
+          "patternErrorMessage": "Token phải có định dạng ghp_/gho_/ghs_."
+        },
+        "tomemiruRelease.workspaceEnvFile": {
+          "type": "string",
+          "default": ".env",
+          "markdownDescription": "Đường dẫn file `.env` (theo workspace root) chứa `GITHUB_TOKEN=` khi authMethod = `env`."
+        },
+        "tomemiruRelease.defaultOwner": {
+          "type": "string",
+          "markdownDescription": "GitHub owner mặc định cho các repository (ví dụ: `tomemiru`).",
+          "default": "tomemiru"
+        },
+        "tomemiruRelease.repoPaths": {
+          "type": "object",
+          "markdownDescription": "Map repo name -> localPath tuyệt đối hoặc relative (ví dụ: `{ \"tomemiru\": \"../tomemiru\" }`).",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {
+            "tomemiru": "../tomemiru",
+            "tomemiru-api": "../tomemiru-api",
+            "tomemiru-db": "../tomemiru-db",
+            "aapa-tomemiru-api": "../aapa-tomemiru-api"
+          }
+        },
+        "tomemiruRelease.repoConfigs": {
+          "type": "object",
+          "markdownDescription": "Cấu hình chi tiết cho từng repo: `{ \"tomemiru-db\": { \"isDbRepo\": true } }`.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "isDbRepo": {
+                "type": "boolean",
+                "description": "Repo có phải là database repo không"
+              },
+              "dependsOnDb": {
+                "type": "boolean",
+                "description": "Repo có phụ thuộc vào database package không"
+              },
+              "dbPackageName": {
+                "type": "string",
+                "description": "Tên package database (ví dụ: @tomemiru/db)"
+              },
+              "deployBranches": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Danh sách các branch deploy"
+              }
+            }
+          },
+          "default": {
+            "tomemiru-db": {
+              "isDbRepo": true
+            },
+            "tomemiru-api": {
+              "dependsOnDb": true,
+              "dbPackageName": "@tomemiru/db",
+              "deployBranches": ["deploy-jp"]
+            },
+            "tomemiru": {
+              "deployBranches": ["deploy-jp"]
+            }
+          }
+        },
+        "tomemiruRelease.defaultBranches": {
+          "type": "object",
+          "markdownDescription": "Định nghĩa branch mặc định cho mỗi repo: `{ \"tomemiru\": { \"main\": \"main\", \"develop\": \"develop\" } }`.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "main": {
+                "type": "string"
+              },
+              "develop": {
+                "type": "string"
+              },
+              "deployBranches": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "main",
+              "develop"
+            ]
+          },
+          "default": {
+            "default": {
+              "main": "main",
+              "develop": "develop",
+              "deployBranches": [
+                "deploy-jp",
+                "deploy-vn"
+              ]
+            },
+            "tomemiru-db": {
+              "main": "main",
+              "develop": "develop",
+              "deployBranches": [
+                "deploy-stg"
+              ]
+            },
+            "aapa-tomemiru-api": {
+              "main": "main",
+              "develop": "develop",
+              "deployBranches": [
+                "deploy-stg"
+              ]
+            }
+          }
+        },
+        "tomemiruRelease.dryRunByDefault": {
+          "type": "boolean",
+          "default": true,
+          "description": "Chạy các workflow ở chế độ dry-run mặc định (chỉ preview, không thực thi)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build:webview": "vite build --config webviews/dashboard/vite.config.ts",
+    "dev:webview": "vite dev --config webviews/dashboard/vite.config.ts",
+    "compile": "npm run build:webview && tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/semver": "^7.5.6",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3",
+    "vite": "^6.4.1",
+    "vsce": "^2.15.0",
+    "vue": "^3.5.24",
+    "vue-tsc": "^3.1.4"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.2",
+    "ajv": "^8.12.0",
+    "dotenv": "^16.3.1",
+    "fs-extra": "^11.1.1",
+    "ora": "^7.0.1",
+    "semver": "^7.5.4",
+    "simple-git": "^3.20.0"
+  }
+}
