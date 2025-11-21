@@ -33,7 +33,7 @@
     </div>
 
     <div class="actions-grid">
-      <ActionCard icon="📝" title="Release PR develop → main" description="Tự động tạo PR merge develop vào main.">
+      <ActionCard icon="📝" title="Release PR develop → main">
         <input v-model="releaseTitle" type="text" />
         <button class="primary" :disabled="!releaseTitle.trim() || isLoadingCreateReleasePR" @click="createReleasePR">
           <span v-if="isLoadingCreateReleasePR">⏳ Đang xử lý...</span>
@@ -45,7 +45,6 @@
         v-if="block.isDbRepo"
         icon="🧪"
         title="DB Pre-release"
-        description="Checkout từ develop và publish version dạng -pre-release."
       >
         <button class="primary" :disabled="isLoadingDbPreRelease" @click="publishDbPreRelease">
           <span v-if="isLoadingDbPreRelease">⏳ Đang xử lý...</span>
@@ -57,7 +56,6 @@
         v-if="canDeployStg"
         icon="🚀"
         title="Deploy STG (JP)"
-        description="Force push develop → deploy-jp và chạy yarn staging:deploy."
       >
         <div v-if="needsDbVersion" class="db-version-block">
           <label>
@@ -81,14 +79,14 @@
         </button>
       </ActionCard>
 
-      <ActionCard icon="🔀" title="Merge Release PR" description="Rebase & merge PR develop → main.">
+      <ActionCard icon="🔀" title="Merge Release PR">
         <button class="primary" :disabled="isLoadingMergeReleasePr" @click="mergeReleasePr">
           <span v-if="isLoadingMergeReleasePr">⏳ Đang xử lý...</span>
           <span v-else>Merge Release</span>
         </button>
       </ActionCard>
 
-      <ActionCard icon="⬆️" title="Bump version package.json" description="Checkout branch, bump version theo rule và push.">
+      <ActionCard icon="⬆️" title="Bump version package.json">
         <label>
           Branch
           <input v-model="bumpBranch" type="text" />
@@ -103,7 +101,6 @@
         v-if="block.isDbRepo"
         icon="📦"
         title="DB Official Release"
-        description="Publish version chính thức từ main (must match origin)."
       >
         <button class="primary" :disabled="isLoadingDbOfficial" @click="publishDbOfficial">
           <span v-if="isLoadingDbOfficial">⏳ Đang xử lý...</span>
@@ -111,7 +108,7 @@
         </button>
       </ActionCard>
 
-      <ActionCard icon="🏷️" title="Tag release" description="Checkout main, sync và tạo tag version hiện tại.">
+      <ActionCard icon="🏷️" title="Tag release">
         <button class="primary" :disabled="isLoadingCreateTag" @click="createTag">
           <span v-if="isLoadingCreateTag">⏳ Đang xử lý...</span>
           <span v-else>Tạo & Push tag</span>
@@ -121,7 +118,6 @@
       <ActionCard
         icon="🧹"
         title="Reset deploy branches"
-        description="Force push main vào các deploy branches đã chọn."
       >
         <div class="branch-checkboxes" v-if="block.deployBranches.length">
           <label v-for="branch in block.deployBranches" :key="branch">
@@ -169,6 +165,14 @@ const selectedResetBranches = ref<string[]>([...props.block.deployBranches])
 const developBranch = computed(() => props.block.developBranch || props.block.baseBranch || 'develop')
 const canDeployStg = computed(() => props.repo === 'tomemiru' || props.repo === 'tomemiru-api')
 const needsDbVersion = computed(() => props.repo === 'tomemiru-api')
+const isLoadingCreateReleasePR = computed(() => dashboardStore.isLoadingAction('createDevelopToMainPR', props.repo))
+const isLoadingDbPreRelease = computed(() => dashboardStore.isLoadingAction('runDbPreRelease', props.repo))
+const isLoadingDeployStg = computed(() => dashboardStore.isLoadingAction('deployStg', props.repo))
+const isLoadingMergeReleasePr = computed(() => dashboardStore.isLoadingAction('mergeReleasePr', props.repo))
+const isLoadingBumpVersion = computed(() => dashboardStore.isLoadingAction('bumpPackageVersion', props.repo))
+const isLoadingDbOfficial = computed(() => dashboardStore.isLoadingAction('publishDbOfficial', props.repo))
+const isLoadingCreateTag = computed(() => dashboardStore.isLoadingAction('pushReleaseTag', props.repo))
+const isLoadingResetDeploy = computed(() => dashboardStore.isLoadingAction('resetDeployBranches', props.repo))
 
 watch(
   () => props.block,
@@ -439,6 +443,7 @@ function defaultReleaseTitle() {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 14px;
+  align-items: stretch;
 }
 input,
 select {

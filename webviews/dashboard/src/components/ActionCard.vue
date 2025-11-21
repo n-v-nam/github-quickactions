@@ -3,10 +3,7 @@
     <div class="card-header">
       <div class="card-title">
         <span class="card-icon">{{ icon }}</span>
-        <div>
-          <h4>{{ title }}</h4>
-          <p>{{ description }}</p>
-        </div>
+        <h4>{{ title }}</h4>
       </div>
       <slot name="toolbar" />
     </div>
@@ -20,7 +17,6 @@
 interface Props {
   icon: string
   title: string
-  description?: string
 }
 
 defineProps<Props>()
@@ -35,6 +31,7 @@ defineProps<Props>()
   display: flex;
   flex-direction: column;
   gap: 12px;
+  height: 100%;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 .card-header {
@@ -55,15 +52,14 @@ defineProps<Props>()
   margin: 0;
   font-size: 14px;
 }
-.card-title p {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: var(--vscode-descriptionForeground);
-}
 .card-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex: 1;
+}
+.card-body > :last-child {
+  margin-top: auto;
 }
 </style>
 
