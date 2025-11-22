@@ -15,8 +15,8 @@ export class StatusBarManager {
         try {
             const user = await AuthService.getCurrentGitHubUser()
             if (user) {
-                this.item.text = `$(github) ${user.login} - Tome GitTool`
-                this.item.tooltip = 'Click để mở Release Settings'
+                this.item.text = `$(github) ${user.login} - Git QuickActions`
+                this.item.tooltip = 'Click để mở GitQuickActions dashboard'
                 this.item.backgroundColor = undefined
                 return
             }
