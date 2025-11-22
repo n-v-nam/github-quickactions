@@ -4,6 +4,10 @@
   "description": "VSCode extension giúp quản lý workflow release nhiều repo (PR, merge, publish) với giao diện trực quan và an toàn.",
   "version": "1.1.0",
   "publisher": "namcris",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/n-v-nam/github-quickactions"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
