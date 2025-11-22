@@ -45,7 +45,7 @@
             "env",
             "manual"
           ],
-          "default": "vscode",
+          "default": "manual",
           "markdownDescription": "Phương thức authentication GitHub. `vscode` (khuyến nghị) dùng OAuth tích hợp VSCode, `env` đọc từ file `.env`, `manual` dùng Personal Access Token lưu trong settings."
         },
         "tomemiruRelease.manualToken": {
@@ -63,7 +63,7 @@
         "tomemiruRelease.defaultOwner": {
           "type": "string",
           "markdownDescription": "GitHub owner mặc định cho các repository (ví dụ: `tomemiru`).",
-          "default": "tomemiru"
+          "default": "azoom"
         },
         "tomemiruRelease.repoPaths": {
           "type": "object",
@@ -112,10 +112,14 @@
             "tomemiru-api": {
               "dependsOnDb": true,
               "dbPackageName": "@tomemiru/db",
-              "deployBranches": ["deploy-jp"]
+              "deployBranches": [
+                "deploy-stg"
+              ]
             },
             "tomemiru": {
-              "deployBranches": ["deploy-jp"]
+              "deployBranches": [
+                "deploy-stg"
+              ]
             }
           }
         },
@@ -183,7 +187,7 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "package": "vsce package",
+    "package": "node ./scripts/vsce-package.cjs",
     "publish": "vsce publish",
     "vscode:prepublish": "npm run compile"
   },

@@ -24,10 +24,10 @@ export class AuthService {
             if (token) {
                 return token
             }
-            const envToken = await this.getEnvToken(config.get<string>('workspaceEnvFile') || '.env')
-            if (envToken) {
-                return envToken
-            }
+            // const envToken = await this.getEnvToken(config.get<string>('workspaceEnvFile') || '.env')
+            // if (envToken) {
+            //     return envToken
+            // }
             if (!silent) {
                 throw new Error('Không tìm thấy GitHub token. Vui lòng nhập manual token hoặc cấu hình env file.')
             }
@@ -35,18 +35,18 @@ export class AuthService {
         }
 
         if (authMethod === 'env') {
-            const manualToken = await this.getManualToken(config, false)
-            if (manualToken) {
-                return manualToken
-            }
+            // const manualToken = await this.getManualToken(config, false)
+            // if (manualToken) {
+            //     return manualToken
+            // }
             const envToken = await this.getEnvToken(config.get<string>('workspaceEnvFile') || '.env')
             if (envToken) {
                 return envToken
             }
-            const manualTokenPrompt = await this.getManualToken(config, !silent)
-            if (manualTokenPrompt) {
-                return manualTokenPrompt
-            }
+            // const manualTokenPrompt = await this.getManualToken(config, !silent)
+            // if (manualTokenPrompt) {
+            //     return manualTokenPrompt
+            // }
             if (!silent) {
                 throw new Error('Không tìm thấy GitHub token trong env file. Vui lòng cấu hình token.')
             }

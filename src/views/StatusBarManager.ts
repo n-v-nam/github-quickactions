@@ -15,7 +15,7 @@ export class StatusBarManager {
         try {
             const user = await AuthService.getCurrentGitHubUser()
             if (user) {
-                this.item.text = `$(github) ${user.login}`
+                this.item.text = `$(github) ${user.login} - Tome GitTool`
                 this.item.tooltip = 'Click để mở Release Settings'
                 this.item.backgroundColor = undefined
                 return
